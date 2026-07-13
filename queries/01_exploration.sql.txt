@@ -1,0 +1,27 @@
+use role accountadmin;
+use warehouse compute_wh;
+use schema snowflake_sample_data.tpch_sf1;
+
+-- first look at the data, just seeing what's actually in here
+select * from customer limit 10;
+
+select * from orders limit 10;
+
+select * from lineitem limit 10;
+
+-- checking sizes across all 8 tables before doing any joins
+select 'customer' as table_name, count(*) as row_count from customer
+union all
+select 'orders', count(*) from orders
+union all
+select 'lineitem', count(*) from lineitem
+union all
+select 'supplier', count(*) from supplier
+union all
+select 'part', count(*) from part
+union all
+select 'partsupp', count(*) from partsupp
+union all
+select 'nation', count(*) from nation
+union all
+select 'region', count(*) from region;
