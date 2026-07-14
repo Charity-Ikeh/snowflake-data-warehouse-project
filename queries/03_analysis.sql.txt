@@ -1,0 +1,36 @@
+use role accountadmin;
+use warehouse compute_wh;
+use schema snowflake_sample_data.tpch_sf1;
+
+-- customer value segmentation based on total order spend
+-- first attempt used thresholds of 500000/200000, which put 99,091 of ~150,000 
+-- customers into "high value" - not a useful segmentation. adjusted thresholds 
+-- to 3000000/1500000 after reviewing the actual spend distribution in this dataset
+select
+    case
+        when total_spent >= 3000000 then 'high value'
+        when total_spent >= 1500000 then 'mid value'
+        when total_spent > 0 then 'low value'
+        else 'no orders'
+    end as customer_segment,
+    count(*) as num_customers,
+    round(avg(total_spent), 2) as avg_spent_per_customer
+from (
+    select 
+        c.c_custkey,
+        coalesce(sum(o.o_totalprice), 0) as total_spent
+    from customer c
+    left join orders o on c.c_custkey = o.o_custkey
+    group by c.c_custkey
+) customer_totals
+group by customer_segment
+order by avg_spent_per_customer desc;
+
+-- basic data quality check on orders: nulls in key fields, invalid price values
+select
+    count(*) as total_orders,
+    count(o_orderkey) as non_null_orderkey,
+    count(o_custkey) as non_null_custkey,
+    sum(case when o_totalprice <= 0 then 1 else 0 end) as orders_with_zero_or_negative_price,
+    sum(case when o_orderdate is null then 1 else 0 end) as orders_with_null_date
+from orders;
