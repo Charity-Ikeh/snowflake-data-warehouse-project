@@ -42,7 +42,33 @@ Query: [`queries/01_exploration.sql`](queries/01_exploration.sql)
 
 
 ### 2. Joins and aggregation
-(to be filled in)
+
+Moved from single-table exploration into multi-table joins to answer real business questions.
+
+**Nation-level order value**
+
+Joined CUSTOMER, ORDERS, and NATION to see which nations generate the most order value.
+
+Top 4 by total order value:
+
+| Nation     | Total orders | Total order value | Avg order value |
+|------------|--------------|--------------------|--------------------|
+| France     | 61,600       | $9.32B             | $151,277.86        |
+| Indonesia  | 61,377       | $9.30B             | $151,536.08        |
+| Russia     | 61,495       | $9.28B             | $150,944.36        |
+| Mozambique | 61,267       | $9.25B             | $150,964.05        |
+
+Order counts and total values stayed fairly close across all 25 nations (roughly 58,000–61,600 
+orders each). This reflects TPC-H's evenly distributed sample data rather than any real regional 
+skew, worth noting rather than overstating as a genuine business insight.
+
+**Part-level revenue**
+
+Joined LINEITEM and PART to find the top 20 parts by revenue generated (extended price minus 
+discount, summed across all line items).
+
+Query: [`queries/02_joins_aggregation.sql`](queries/02_joins_aggregation.sql)
+
 
 ### 3. Analysis
 (to be filled in)
