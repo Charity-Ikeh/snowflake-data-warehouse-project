@@ -1,0 +1,27 @@
+use role accountadmin;
+use warehouse compute_wh;
+use schema snowflake_sample_data.tpch_sf1;
+
+-- which nations generate the most order value
+select 
+    n.n_name as nation,
+    count(distinct o.o_orderkey) as total_orders,
+    sum(o.o_totalprice) as total_order_value,
+    round(avg(o.o_totalprice), 2) as avg_order_value
+from customer c
+join orders o on c.c_custkey = o.o_custkey
+join nation n on c.c_nationkey = n.n_nationkey
+group by n.n_name
+order by total_order_value desc;
+
+-- which parts generate the most revenue
+select 
+    p.p_name as part_name,
+    p.p_brand,
+    count(l.l_orderkey) as times_ordered,
+    sum(l.l_extendedprice * (1 - l.l_discount)) as total_revenue
+from lineitem l
+join part p on l.l_partkey = p.p_partkey
+group by p.p_name, p.p_brand
+order by total_revenue desc
+limit 20;
